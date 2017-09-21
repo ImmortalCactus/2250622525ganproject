@@ -1,8 +1,12 @@
 import tensorflow as tf
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+
+plt.ion()
 
 batch_size = 256
 g_dim = 128
@@ -66,3 +70,8 @@ for step in range(20001):
     if(step%500==0):
         print(sess.run(d_loss, feed_dict = {x_d: batch_x, x_g: sample_Z(batch_size, g_dim)}))
         print(sess.run(g_loss, feed_dict = {x_g: sample_Z(batch_size, g_dim)}))
+        pixels=sess.run(g_sample,feed_dict={x_g: sample_Z(1, g_dim)})
+        pixels=pixels.reshape((28,28))
+        plt.imshow(pixels)
+        plt.pause(0.001)
+        plt.show()
