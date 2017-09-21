@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
@@ -62,3 +63,6 @@ for step in range(20001):
     batch_x = mnist.train.next_batch(batch_size)[0]
     d_loss_train = sess.run([optimizer1, d_loss], feed_dict = {x_d: batch_x, x_g: sample_Z(batch_size, g_dim)})
     g_loss_train = sess.run([optimizer2, g_loss], feed_dict = {x_g: sample_Z(batch_size, g_dim)})
+    if(step%500==0):
+        print(sess.run(d_loss, feed_dict = {x_d: batch_x, x_g: sample_Z(batch_size, g_dim)}))
+        print(sess.run(g_loss, feed_dict = {x_g: sample_Z(batch_size, g_dim)}))
