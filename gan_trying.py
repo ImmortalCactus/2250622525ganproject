@@ -10,6 +10,7 @@ plt.ion()
 
 batch_size = 256
 g_dim = 128
+training_label = 2
 x_d = tf.placeholder(tf.float32, shape = [None, 784])
 x_g = tf.placeholder(tf.float32, shape = [None, 128])
 def weight_variable(shape):
@@ -64,12 +65,22 @@ sess = tf.Session()
 init_op = tf.global_variables_initializer()
 sess.run(init_op)
 for step in range(20001):
-    batch_x = mnist.train.next_batch(batch_size)[0]
-    d_loss_train = sess.run([optimizer1, d_loss], feed_dict = {x_d: batch_x, x_g: sample_Z(batch_size, g_dim)})
-    g_loss_train = sess.run([optimizer2, g_loss], feed_dict = {x_g: sample_Z(batch_size, g_dim)})
+    batch = mnist.train.next_batch(batch_size)
+    counter = 0
+    size=0
+    for i in range(batch_size):
+        if(batch[1][i][training_label]):
+            size=size+1
+    cleared_batch = np.ndarray(shape=(size,784))
+    for i in range(batch_size):
+        if(batch[1][i][training_label]):
+            cleared_batch[counter]=batch[0][i]
+            counter=counter+1
+    d_loss_train = sess.run([optimizer1, d_loss], feed_dict = {x_d: cleared_batch, x_g: sample_Z(size, g_dim)})
+    g_loss_train = sess.run([optimizer2, g_loss], feed_dict = {x_g: sample_Z(size, g_dim)})
     if(step%500==0):
-        print(sess.run(d_loss, feed_dict = {x_d: batch_x, x_g: sample_Z(batch_size, g_dim)}))
-        print(sess.run(g_loss, feed_dict = {x_g: sample_Z(batch_size, g_dim)}))
+        print(sess.run(d_loss, feed_dict = {x_d: cleared_batch, x_g: sample_Z(size, g_dim)}))
+        print(sess.run(g_loss, feed_dict = {x_g: sample_Z(size, g_dim)}))
         pixels=sess.run(g_sample,feed_dict={x_g: sample_Z(1, g_dim)})
         pixels=pixels.reshape((28,28))
         plt.imshow(pixels)
