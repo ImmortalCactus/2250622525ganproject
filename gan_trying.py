@@ -66,8 +66,8 @@ g_optimizer = tf.train.RMSPropOptimizer(0.0005).minimize(g_loss, var_list= var_g
 sess = tf.Session()
 init_op = tf.global_variables_initializer()
 sess.run(init_op)
-for step in range(20001):
-    for i in range(5):
+for step in range(60001):
+    for i in range(1):
         batch = mnist.train.next_batch(batch_size)
         counter = 0
         size=0
