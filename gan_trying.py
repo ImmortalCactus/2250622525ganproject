@@ -9,6 +9,9 @@ plt.ion()
 batch_size = 256
 g_dim = 128
 training_label = 2
+clip_range = 1000
+keep_rate = 0.5
+
 x_d = tf.placeholder(tf.float32, shape = [None, 784])
 x_g = tf.placeholder(tf.float32, shape = [None, 128])
 def weight_variable(shape):
@@ -42,7 +45,7 @@ def generator(z):
 
 
 def discriminator(x):
-    h_d1 = tf.nn.relu(tf.add(tf.matmul(x, weights["w_d1"]), biases["b_d1"]))
+    h_d1 = tf.nn.dropout(tf.nn.relu(tf.add(tf.matmul(x, weights["w_d1"]), biases["b_d1"])),keep_rate)
     h_d2 = tf.add(tf.matmul(h_d1, weights["w_d2"]), biases["b_d2"])
     return h_d2
 
@@ -55,10 +58,10 @@ d_fake = discriminator(g_sample)
 
 d_loss = tf.reduce_mean(d_real) -  tf.reduce_mean(d_fake)
 g_loss = -tf.reduce_mean(d_fake)
-clip_D = [p.assign(tf.clip_by_value(p, -0.01, 0.01))for p in var_d]
+clip_D = [p.assign(tf.clip_by_value(p, -clip_range, clip_range))for p in var_d]
                          
-d_optimizer = tf.train.RMSPropOptimizer(0.001).minimize(-d_loss, var_list= var_d)
-g_optimizer = tf.train.RMSPropOptimizer(0.0002).minimize(g_loss, var_list= var_g)
+d_optimizer = tf.train.RMSPropOptimizer(0.0005).minimize(-d_loss, var_list= var_d)
+g_optimizer = tf.train.RMSPropOptimizer(0.0005).minimize(g_loss, var_list= var_g)
 
 sess = tf.Session()
 init_op = tf.global_variables_initializer()
@@ -84,6 +87,6 @@ for step in range(20001):
     if(step%500==0):
         pixels=sess.run(g_sample,feed_dict={x_g: sample_Z(1, g_dim)})
         pixels=pixels.reshape((28,28))
-        plt.imshow(pixels)
+        plt.imshow(pixels,cmap="gray")
         plt.pause(0.001)
         plt.show()
