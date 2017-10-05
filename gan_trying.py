@@ -13,6 +13,7 @@ clip_range = 1000
 keep_rate = 0.5
 training_step = 100000
 output_interval = 500
+photo_tag=0
 
 x_d = tf.placeholder(tf.float32, shape = [None, 784])
 x_g = tf.placeholder(tf.float32, shape = [None, 128])
@@ -91,5 +92,6 @@ for step in range(training_step):
         pixels=sess.run(g_sample,feed_dict={x_g: sample_Z(1, g_dim)})
         pixels=pixels.reshape((28,28))
         plt.imshow(pixels,cmap="gray")
-        plt.pause(0.001)
-        plt.show()
+        photo_tag=photo_tag+1
+        photo= './saved_image/'+str(training_label)+'_'+str(photo_tag)+'.png'
+        plt.savefig(photo)
