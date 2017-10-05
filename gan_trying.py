@@ -11,6 +11,8 @@ g_dim = 128
 training_label = 2
 clip_range = 1000
 keep_rate = 0.5
+training_step = 100000
+output_interval = 500
 
 x_d = tf.placeholder(tf.float32, shape = [None, 784])
 x_g = tf.placeholder(tf.float32, shape = [None, 128])
@@ -66,7 +68,7 @@ g_optimizer = tf.train.RMSPropOptimizer(0.0005).minimize(g_loss, var_list= var_g
 sess = tf.Session()
 init_op = tf.global_variables_initializer()
 sess.run(init_op)
-for step in range(100000):
+for step in range(training_step):
     for i in range(1):
         batch = mnist.train.next_batch(batch_size)
         counter = 0
@@ -84,7 +86,8 @@ for step in range(100000):
 
     g_loss_train = sess.run([g_optimizer, g_loss], feed_dict = {x_g: sample_Z(size, g_dim)})
 
-    if(step%500==0):
+    if(step%output_interval==0):
+        print(step)
         pixels=sess.run(g_sample,feed_dict={x_g: sample_Z(1, g_dim)})
         pixels=pixels.reshape((28,28))
         plt.imshow(pixels,cmap="gray")
