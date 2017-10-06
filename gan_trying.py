@@ -23,6 +23,9 @@ def weight_variable(shape):
 def bias_variable(shape):
     initial = tf.constant(0.1, shape = shape)
     return tf.Variable(initial)
+def leakyrelu(x,alpha=0.2):
+    x = tf.maximum(alpha*x,x)
+    return x
 
 weights = {
     "w_d1" : weight_variable([784, 128]),
@@ -42,13 +45,13 @@ var_d = [weights["w_d1"], weights["w_d2"], biases["b_d1"], biases["b_d2"]]
 var_g = [weights["w_g1"], weights["w_g2"], biases["b_g1"], biases["b_g2"]]
 
 def generator(z):
-    h_g1 = tf.nn.relu(tf.add(tf.matmul(z, weights["w_g1"]), biases["b_g1"]))
+    h_g1 = leakyrelu(tf.add(tf.matmul(z, weights["w_g1"]), biases["b_g1"]))
     h_g2 = tf.add(tf.matmul(h_g1, weights["w_g2"]),biases["b_g2"])
     return h_g2
 
 
 def discriminator(x):
-    h_d1 = tf.nn.dropout(tf.nn.relu(tf.add(tf.matmul(x, weights["w_d1"]), biases["b_d1"])),keep_rate)
+    h_d1 = tf.nn.dropout(leakyrelu(tf.add(tf.matmul(x, weights["w_d1"]), biases["b_d1"])),keep_rate)
     h_d2 = tf.add(tf.matmul(h_d1, weights["w_d2"]), biases["b_d2"])
     return h_d2
 
