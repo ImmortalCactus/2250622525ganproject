@@ -1,7 +1,7 @@
 import urllib.request  as urllib
 import os
+from PIL.Image import core as Image
 number=0
-"""while rage in 100"""
 with open("imagenet.synset.txt") as f:
     content = f.readlines()
 # you may also want to remove whitespace characters like `\n` at the end of each line
@@ -14,5 +14,7 @@ for i in content:
         url=str(i)
         image=urllib.URLopener()
         image.retrieve(url,name)
+        im = open(name)
+        im.save(name, dpi=(600,600))
     except IOError:
         continue
