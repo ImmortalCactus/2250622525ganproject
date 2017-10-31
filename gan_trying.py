@@ -9,7 +9,7 @@ plt.ion()
 batch_size = 256
 g_dim = 128
 training_label = 2
-clip_range = 1000
+clip_range = 100000000000
 keep_rate = 0.5
 training_step = 1000000
 output_interval = 500
